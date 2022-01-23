@@ -31,7 +31,9 @@ exports.getUnit = (req, res) => {
       var results = [];
       querySnapshot.forEach((doc) => {
         let docData = doc.data();
-        unitData.push(docData);
+        // let idData = doc.id;
+        // let idDataObj = {id: idData}
+        unitData.push({ ...docData, docId: doc.id });
         var instructionRef = db
           .collection('allDocuments')
           .doc(docData.instructionId);
@@ -56,4 +58,47 @@ exports.getUnit = (req, res) => {
       console.error(err);
       return res.status(500).json({ error: err.message });
     });
+};
+
+exports.updateAffectedUnit = (req, res) => {
+  const affectedUnitStatus = req.body;
+
+  //Create a batched write https://firebase.google.com/docs/firestore/manage-data/transactions#batched-writes
+
+  var batch = db.batch();
+  const statusArr = ['open', 'confirmed', 'refused'];
+  let rejectedChange = false;
+
+  if (affectedUnitStatus.length > 0) {
+    affectedUnitStatus.forEach((element) => {
+      var elementRef = db
+        .collection(`/Units/${req.params.unitId}/Instructions`)
+        .doc(element.docId);
+
+      if (statusArr.includes(element.status)) {
+        batch.update(elementRef, { status: element.status });
+      } else {
+        rejectedChange = true;
+        return res.status(400).json({ error: 'unknown status' });
+      }
+    });
+    if (!rejectedChange) {
+      batch
+        .commit()
+        .then(() => {
+          return res.status(200).json({confirmed:'success write!'});
+        })
+        .catch((err) => {
+          console.error(err);
+          return res.status(400).json({ error: err.message });
+        });
+    }
+  } else {
+    return res.status(400).json({error:'bad request'});
+  }
+
+  // return res.status(200).json({});
+
+  // db.collection(`/Units/${req.params.unitId}/Instructions`)
+  //   .get()
 };
