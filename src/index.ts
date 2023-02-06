@@ -2,6 +2,8 @@ import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import { connectDB } from './config/db';
 
+import unitRoutes from './routes/unit';
+
 
 dotenv.config();
 
@@ -13,6 +15,10 @@ connectDB();
 app.get('/', (req: Request, res: Response) => {
   res.send('Express + TypeScript Server 1');
 });
+
+app.use('/unit', unitRoutes);
+
+
 
 
 app.listen(port, () => {
