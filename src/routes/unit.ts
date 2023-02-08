@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import { Request } from 'express';
+import {getAffectedUnit, addAffectedUnit} from '../controllers/unitController'
 
 const router = Router()
 
@@ -7,9 +7,10 @@ const router = Router()
 // GET /unit/:unitNo
 
 
-router.get('/:unitNo', (req: Request<{unitNo: string}>) => {
-	
-	console.log('Requested unit No: ', req.params.unitNo);
-})
+
+
+router.post('/:unit', addAffectedUnit);
+
+router.get('/:unit', getAffectedUnit);
 
 export default router;

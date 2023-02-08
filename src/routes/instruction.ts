@@ -3,6 +3,6 @@ import { createNewInstruction } from "../controllers/instructionController";
 
 const router = Router();
 
-router.post('/create', createNewInstruction);
+router.post('/', createNewInstruction);
 
 export default router;
