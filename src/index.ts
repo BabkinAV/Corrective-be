@@ -1,10 +1,18 @@
-import express, { Express, Request, Response } from 'express';
+import express, { Express, Request, Response,  ErrorRequestHandler   } from 'express';
 import path from 'path';
 import dotenv from 'dotenv';
 import { connectDB } from './config/db';
+import { json } from 'body-parser';
+
 
 import unitRoutes from './routes/unit';
 import instructionRoutes from './routes/instruction';
+
+export class StatusError extends Error {
+  statusCode?: number;
+  data?: string;
+}
+
 
 
 dotenv.config();
@@ -13,6 +21,9 @@ const app: Express = express();
 const port = process.env.PORT;
 
 connectDB();
+
+app.use(json());
+
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Express + TypeScript Server 1');
@@ -26,7 +37,22 @@ app.use('/instruction', instructionRoutes);
 
 app.use('/static', express.static(path.join(__dirname, '..', 'public')));
 
-console.log('localhost')
+console.log('localhost');
+
+const errorHandler: ErrorRequestHandler = (
+  error: StatusError,
+  req,
+  res,
+  next
+) => {
+  console.log(error);
+  const status = error.statusCode ?? 500;
+  const message = error.message;
+  const data = error.data;
+  res.status(status).json({ message, data });
+};
+
+app.use(errorHandler);
 
 
 

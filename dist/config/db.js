@@ -16,8 +16,16 @@ exports.connectDB = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 require("colors");
 const connectDB = () => __awaiter(void 0, void 0, void 0, function* () {
-    mongoose_1.default.set('strictQuery', true);
-    const conn = yield mongoose_1.default.connect(process.env.MONGO_URI);
-    console.log(`MongoDB Connected: ${conn.connection.host}`.cyan.underline);
+    try {
+        mongoose_1.default.set('strictQuery', true);
+        const conn = yield mongoose_1.default.connect(process.env.MONGO_URI);
+        console.log(`MongoDB Connected: ${conn.connection.host}`.cyan.underline);
+    }
+    catch (error) {
+        let message = 'Unknown Error';
+        if (error instanceof Error)
+            message = error.message;
+        console.log(message);
+    }
 });
 exports.connectDB = connectDB;
