@@ -9,8 +9,8 @@ const router = Router()
 
 
 
-router.post('/:unit', addAffectedUnit);
+router.post('/', addAffectedUnit);
 
-router.get('/:unit', getAffectedUnit);
+router.get('/', getAffectedUnit);
 
 export default router;

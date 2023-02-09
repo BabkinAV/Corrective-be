@@ -1,31 +1,53 @@
-import { Schema, model, Types } from 'mongoose';
+import { Schema, model, Types, HydratedDocument, Model, ObjectId } from 'mongoose';
 
 export interface IUnit {
   unitNumber: string;
   instructions: {
-    instructionId: Types.ObjectId;
+    instruction: Types.ObjectId;
     status: 'open' | 'confirmed' | 'refused';
   }[];
 }
 
-const UnitSchema = new Schema<IUnit>({
-  unitNumber: { type: String, required: true, unique: true },
-  instructions: [
-    {
-      instructionId: {
-        type: Schema.Types.ObjectId,
-        ref: 'Instruction',
-        required: true,
-      },
-      status: {
-        type: String,
-        required: true,
-        enum: ['open', 'confirmed', 'refused'],
-        default: 'open',
-      },
-    },
-  ],
-	
-});
+export interface IUnitMethods {
+	addInstructionToArray(instructionId: Types.ObjectId): Promise<HydratedDocument<IUnit>>
+}
 
-export const Unit = model<IUnit>('Unit', UnitSchema);
+type UnitModel = Model<IUnit, {}, IUnitMethods>
+
+const UnitSchema = new Schema<IUnit, UnitModel, IUnitMethods>(
+  {
+    unitNumber: { type: String, required: true, unique: true },
+    instructions: [
+      {
+        instruction: {
+          type: Schema.Types.ObjectId,
+          ref: 'Instruction',
+          required: true,
+        },
+        status: {
+          type: String,
+          required: true,
+          enum: ['open', 'confirmed', 'refused'],
+          default: 'open',
+        },
+      },
+    ],
+  },
+);
+
+UnitSchema.method('addInstructionToArray', function addInstructionToArray(this: HydratedDocument<IUnit>, instructionId: Types.ObjectId) {
+		console.log('fired!');
+					let updatedInstructionsArr = [...this.instructions];
+					updatedInstructionsArr.push({
+						instruction: instructionId,
+						status: 'open'
+					});
+		console.log('updatedArr: ', updatedInstructionsArr);
+					this.instructions = updatedInstructionsArr;
+					return this.save()
+
+})
+
+
+
+export const Unit = model<IUnit, UnitModel>('Unit', UnitSchema);
