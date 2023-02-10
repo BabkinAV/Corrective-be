@@ -39,8 +39,8 @@ export const addAffectedUnit: RequestHandler = (req, res, next) => {
     });
 };
 export const getAffectedUnit: RequestHandler = (req, res, next) => {
-  const unitNumberBody = req.body.unitNumber as { unitNumber: string };
-  Unit.findOne({ unitNumber: unitNumberBody })
+  const unitNumber = req.params.unitnumber.toUpperCase();
+  Unit.findOne({ unitNumber: unitNumber })
     .populate('instructions.instruction')
     .then(unit => {
       if (!unit) {
@@ -48,7 +48,7 @@ export const getAffectedUnit: RequestHandler = (req, res, next) => {
         error.statusCode = 404;
         throw error; //to be catched up by .catch block
       }
-      res.status(200).json({ messate: 'Unit fetched.', unit });
+      res.status(200).json({ message: 'Unit fetched.', unit });
     })
     .catch((err: { statusCode?: number }) => {
       if (!err.statusCode) {

@@ -3,7 +3,7 @@ import { Schema, model, Date } from 'mongoose';
 export interface IInstruction {
   instNumber:string;
   title: string;
-  instType: 'compulsory' | 'non-compulsory' | 'information';
+  instType: string;
   subsystem: string;
   releaseDate: Date;
   link: string;
@@ -14,9 +14,6 @@ const InstructionSchema = new Schema<IInstruction>({
   title: { type: String, required: true },
   instType: {
     type: String,
-    required: true,
-
-    enum: ['compulsory', 'non-compulsory', 'information'],
   },
   subsystem: { type: String, required: true },
   releaseDate: { type: Date, required: true },

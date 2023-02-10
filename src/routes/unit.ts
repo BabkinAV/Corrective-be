@@ -11,6 +11,6 @@ const router = Router()
 
 router.post('/', addAffectedUnit);
 
-router.get('/', getAffectedUnit);
+router.get('/:unitnumber', getAffectedUnit);
 
 export default router;

@@ -3,7 +3,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import { connectDB } from './config/db';
 import { json } from 'body-parser';
-
+import cors from 'cors';
 
 import unitRoutes from './routes/unit';
 import instructionRoutes from './routes/instruction';
@@ -23,6 +23,7 @@ const port = process.env.PORT;
 connectDB();
 
 app.use(json());
+app.use(cors());
 
 
 app.get('/', (req: Request, res: Response) => {
