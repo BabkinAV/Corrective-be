@@ -7,23 +7,38 @@ import {
   ObjectId,
 } from 'mongoose';
 
+const STATUSES = ['open', 'confirmed', 'refused'] as const;
+type AffectedUnitStatus = typeof STATUSES[number];
+
+// typeguard to define if string type is AffectedUnitStatus
+export function isStatus(status: string): status is AffectedUnitStatus {
+  return STATUSES.includes(status as AffectedUnitStatus);
+}
+
 export interface IUnit {
   unitNumber: string;
   instructions: {
     instruction: Types.ObjectId;
-    status: 'open' | 'confirmed' | 'refused';
+    status: AffectedUnitStatus;
   }[];
 }
 
-export interface IUnitMethods {
+export interface AffectedUnit {
+  instruction: Types.ObjectId;
+  status: AffectedUnitStatus;
+}
+
+export interface IUnitMethodsAndProps {
   addInstructionToArray(
     instructionId: Types.ObjectId
   ): Promise<HydratedDocument<IUnit>>;
+  // updateAffectedUnit(affectedUnitId: Types.ObjectId, updatedStatus: AffectedUnitStatus)
+  instructions: Types.ArraySubdocument<AffectedUnit>;
 }
 
-type UnitModel = Model<IUnit, {}, IUnitMethods>;
+type UnitModel = Model<IUnit, {}, IUnitMethodsAndProps>;
 
-const UnitSchema = new Schema<IUnit, UnitModel, IUnitMethods>({
+const UnitSchema = new Schema<IUnit, UnitModel, IUnitMethodsAndProps>({
   unitNumber: { type: String, required: true, unique: true },
   instructions: [
     {

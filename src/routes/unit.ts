@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {getAffectedUnit, addAffectedUnit} from '../controllers/unitController'
+import {getAffectedUnit, addAffectedUnit, updateAffectedUnitStatus} from '../controllers/unitController'
 
 const router = Router()
 
@@ -9,6 +9,8 @@ const router = Router()
 
 
 router.post('/', addAffectedUnit);
+
+router.put('/updatestatus/:unitnumber', updateAffectedUnitStatus)
 
 router.get('/:unitnumber', getAffectedUnit);
 
