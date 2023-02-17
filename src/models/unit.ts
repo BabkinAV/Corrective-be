@@ -4,36 +4,36 @@ import {
   Types,
   HydratedDocument,
   Model,
-  ObjectId,
 } from 'mongoose';
+import { StatusError } from '..';
 
 const STATUSES = ['open', 'confirmed', 'refused'] as const;
 type AffectedUnitStatus = typeof STATUSES[number];
 
-// typeguard to define if string type is AffectedUnitStatus
+// typeguard to define if string  is of AffectedUnitStatus type
 export function isStatus(status: string): status is AffectedUnitStatus {
   return STATUSES.includes(status as AffectedUnitStatus);
 }
 
-export interface IUnit {
-  unitNumber: string;
-  instructions: {
-    instruction: Types.ObjectId;
-    status: AffectedUnitStatus;
-  }[];
-}
 
 export interface AffectedUnit {
-  instruction: Types.ObjectId;
+	instruction: Types.ObjectId;
   status: AffectedUnitStatus;
 }
 
+export interface IUnit {
+	unitNumber: string;
+	instructions: Types.DocumentArray<AffectedUnit>
+	;
+}
 export interface IUnitMethodsAndProps {
   addInstructionToArray(
     instructionId: Types.ObjectId
   ): Promise<HydratedDocument<IUnit>>;
-  // updateAffectedUnit(affectedUnitId: Types.ObjectId, updatedStatus: AffectedUnitStatus)
-  instructions: Types.ArraySubdocument<AffectedUnit>;
+  updateAffectedUnits(
+    updatesArr: { docId: string; status: string }[]
+  ): Promise<HydratedDocument<IUnit>>;
+  instructions: Types.DocumentArray<AffectedUnit>;
 }
 
 type UnitModel = Model<IUnit, {}, IUnitMethodsAndProps>;
@@ -63,14 +63,36 @@ UnitSchema.method(
     this: HydratedDocument<IUnit>,
     instructionId: Types.ObjectId
   ) {
-    let updatedInstructionsArr = [...this.instructions];
-    updatedInstructionsArr.push({
-      instruction: instructionId,
-      status: 'open',
-    });
-    this.instructions = updatedInstructionsArr;
+   
+		this.instructions.push({instruction: instructionId, status: 'open'})
     return this.save();
-  }
+  },
 );
+
+UnitSchema.method('updateAffectedUnits',
+function updateAffectedUnits(
+	this: HydratedDocument<IUnit>,
+	updatesArr: { docId: string; status: string }[]
+) {
+	updatesArr.forEach(element => {
+
+		let affectedUnit = this.instructions.id(element.docId)
+
+		console.log('isStatus: ', isStatus(element.status));
+		console.log('affectedUnit', affectedUnit);
+		
+		if (isStatus(element.status) && (affectedUnit !== null)) {
+			affectedUnit.status = element.status
+
+		} else {
+			const error = new Error('Incorrect status or affected unit Id') as StatusError;
+			error.statusCode = 404;
+			throw error; //to be catche
+		}
+
+	});
+	return this.save();
+})
+
 
 export const Unit = model<IUnit, UnitModel>('Unit', UnitSchema);

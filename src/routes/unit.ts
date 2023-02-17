@@ -4,14 +4,15 @@ import {getAffectedUnit, addAffectedUnit, updateAffectedUnitStatus} from '../con
 const router = Router()
 
 
-// GET /unit/:unitNo
 
 
-
+// POST /unit/:unitNo
 router.post('/', addAffectedUnit);
 
+// PUT /unit/updatestatus/:unitNo
 router.put('/updatestatus/:unitnumber', updateAffectedUnitStatus)
 
+// GET /unit/updatestatus/:unitNo
 router.get('/:unitnumber', getAffectedUnit);
 
 export default router;
