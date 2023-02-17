@@ -7,6 +7,7 @@ import cors from 'cors';
 
 import unitRoutes from './routes/unit';
 import instructionRoutes from './routes/instruction';
+import authRoutes from './routes/auth';
 
 export class StatusError extends Error {
   statusCode?: number;
@@ -26,9 +27,8 @@ app.use(json());
 app.use(cors());
 
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Express + TypeScript Server 1');
-});
+
+app.use('/auth', authRoutes);
 
 app.use('/unit', unitRoutes);
 app.use('/instruction', instructionRoutes);
