@@ -1,13 +1,13 @@
 import { RequestHandler } from 'express';
 import { Types } from 'mongoose';
 import { StatusError } from '..';
-import { Unit  } from '../models/unit';
+import { Unit } from '../models/unit';
 
 export const addAffectedUnit: RequestHandler = (req, res, next) => {
-  const unitRequestBody = req.body as {
+  const unitRequestBody: {
     unitNumber: string;
     instruction: Types.ObjectId;
-  };
+  } = req.body;
 
   const instructionId = unitRequestBody.instruction;
 
@@ -61,21 +61,21 @@ export const getAffectedUnit: RequestHandler = (req, res, next) => {
 
 export const updateAffectedUnitStatus: RequestHandler = (req, res, next) => {
   const unitNumber = req.params.unitnumber.toUpperCase();
-  const affectedUnitStatus = req.body as {
+  const affectedUnitStatus: {
     docId: string;
     status: string;
-  }[];
+  }[] = req.body;
 
   Unit.findOne({ unitNumber })
     .exec()
     .then(unit => {
       if (unit) {
-				return unit.updateAffectedUnits(affectedUnitStatus)
+        return unit.updateAffectedUnits(affectedUnitStatus);
       } else {
-				const error = new Error('Could not find unit.') as StatusError;
+        const error = new Error('Could not find unit.') as StatusError;
         error.statusCode = 404;
         throw error; //to be catched up by .catch block
-			}
+      }
     })
     .then(updatedUnit => {
       res.status(200).json({

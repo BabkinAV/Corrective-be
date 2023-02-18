@@ -4,7 +4,7 @@ import { HydratedDocument, Types } from 'mongoose';
 import { IInstruction, Instruction } from '../models/instruction';
 
 export const createNewInstruction: RequestHandler = (req, res, next) => {
-  const instructionRequestBody = req.body as IInstruction;
+  const instructionRequestBody:IInstruction = req.body;
   const instructionItem = new Instruction({
     instNumber: instructionRequestBody.instNumber,
     title: instructionRequestBody.title,
