@@ -1,22 +1,26 @@
 import { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
-import { Types } from 'mongoose';
+
+import { HydratedDocument, Types } from 'mongoose';
 import { StatusError } from '..';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
-import { User } from '../models/user';
+import { IUser, User } from '../models/user';
+
+
 
 export const signup = (
   req: Request<{}, {}, { name: string; email: string; password: string }>,
   res: Response,
   next: NextFunction
 ) => {
-	const errors = validationResult(req);
-	if (!errors.isEmpty()) {
-		const error = new Error('Signup validation failed') as StatusError;
-		error.statusCode = 422;
-		error.data = errors.array();
-		throw error; //to be catched up by .catch block
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new Error('Signup validation failed') as StatusError;
+    error.statusCode = 422;
+    error.data = errors.array();
+    throw error; //to be catched up by .catch block
   }
 
   let name = req.body.name;
@@ -31,10 +35,62 @@ export const signup = (
         password: hashedPw,
         name,
       });
-			return user.save()
+      return user.save();
     })
     .then(result => {
-      res.status(201).json({ message: 'User created!',  userId: result._id});
+      res.status(201).json({ message: 'User created!', userId: result._id });
+    })
+    .catch((err: { statusCode?: number }) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+
+      next(err);
+    });
+};
+
+export const login = (
+  req: Request<{}, {}, { email: string; password: string }>,
+  res: Response,
+  next: NextFunction
+) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new Error('Login validation failed') as StatusError;
+    error.statusCode = 422;
+    error.data = errors.array();
+    throw error; //to be catched up by .catch block
+  }
+  let email = req.body.email;
+  let password = req.body.password;
+  let loadedUser: HydratedDocument<IUser>;
+  User.findOne({ email })
+    .then(user => {
+      if (!user) {
+        const error = new Error(
+          'A user with this email could not be found'
+        ) as StatusError;
+        error.statusCode = 401;
+        throw error;
+      }
+      loadedUser = user;
+      return bcrypt.compare(password, user.password);
+    })
+    .then(isEqual => {
+      if (!isEqual) {
+        const error = new Error('Wrong password') as StatusError;
+        error.statusCode = 401;
+        throw error;
+      }
+      const token = jwt.sign(
+        {
+          email: loadedUser.email,
+          userId: loadedUser._id.toString(),
+        },
+        process.env.JWT_SECRET!,
+        { expiresIn: '1d' }
+      );
+      res.status(200).json({ token, userId: loadedUser._id.toString() });
     })
     .catch((err: { statusCode?: number }) => {
       if (!err.statusCode) {
