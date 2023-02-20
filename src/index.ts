@@ -1,4 +1,5 @@
 import express, { Express, Request, Response,  ErrorRequestHandler   } from 'express';
+import { ValidationError } from 'express-validator';
 import path from 'path';
 import dotenv from 'dotenv';
 import { connectDB } from './config/db';
@@ -11,7 +12,7 @@ import authRoutes from './routes/auth';
 
 export class StatusError extends Error {
   statusCode?: number;
-  data?: string;
+  data?: string | ValidationError[];
 }
 
 

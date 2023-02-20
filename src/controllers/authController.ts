@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { validationResult } from 'express-validator';
 import { Types } from 'mongoose';
 import { StatusError } from '..';
 import bcrypt from 'bcryptjs';
@@ -10,6 +11,14 @@ export const signup = (
   res: Response,
   next: NextFunction
 ) => {
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		const error = new Error('Signup validation failed') as StatusError;
+		error.statusCode = 422;
+		error.data = errors.array();
+		throw error; //to be catched up by .catch block
+  }
+
   let name = req.body.name;
   let email = req.body.email;
   let password = req.body.password;
