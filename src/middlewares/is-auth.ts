@@ -9,7 +9,7 @@ type userToken = {
   exp: number
 }
 
-module.exports = (req: Request<{}, {}, {}, {'Authorization': string}>, res: Response, next: NextFunction) => {
+export const isAuth  = (req: Request<{}, {}, {}, {'Authorization': string}>, res: Response, next: NextFunction) => {
 	const authHeader = req.get('Authorization');
 	if (!authHeader) {
 		const error = new Error('Not authenticated.') as StatusError;
@@ -22,7 +22,7 @@ module.exports = (req: Request<{}, {}, {}, {'Authorization': string}>, res: Resp
 		decodedToken = jwt.verify(token, process.env.JWT_SECRET!) as userToken
 	} catch (err) {
 		const error = new Error('token verification error') as StatusError;
-    error.statusCode = 500;
+    error.statusCode = 401;
     throw error;
 	}
 	if (!decodedToken) {

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { validationResult } from 'express-validator';
 
-import { HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 import { StatusError } from '..';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';

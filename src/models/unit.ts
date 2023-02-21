@@ -77,9 +77,6 @@ function updateAffectedUnits(
 	updatesArr.forEach(element => {
 
 		let affectedUnit = this.instructions.id(element.docId)
-
-		console.log('isStatus: ', isStatus(element.status));
-		console.log('affectedUnit', affectedUnit);
 		
 		if (isStatus(element.status) && (affectedUnit !== null)) {
 			affectedUnit.status = element.status

@@ -36,7 +36,6 @@ router.post(
 );
 
 // POST /auth/login
-// TODO: implement login data validation (non-empty fields)
 router.post(
   '/login',
   [
