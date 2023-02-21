@@ -38,7 +38,18 @@ export const signup = (
       return user.save();
     })
     .then(result => {
-      res.status(201).json({ message: 'User created!', userId: result._id });
+
+			const token = jwt.sign(
+        {
+          email,
+					name,
+          userId: result._id.toString(),
+        },
+        process.env.JWT_SECRET!,
+        { expiresIn: '1d' }
+      );
+
+      res.status(201).json({token, message: 'User created!', userId: result._id.toString() });
     })
     .catch((err: { statusCode?: number }) => {
       if (!err.statusCode) {
@@ -82,9 +93,11 @@ export const login = (
         error.statusCode = 401;
         throw error;
       }
+
       const token = jwt.sign(
         {
           email: loadedUser.email,
+					name: loadedUser.name,
           userId: loadedUser._id.toString(),
         },
         process.env.JWT_SECRET!,
