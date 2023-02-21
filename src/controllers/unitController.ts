@@ -65,6 +65,7 @@ export const updateAffectedUnitStatus: RequestHandler = (req, res, next) => {
     docId: string;
     status: string;
   }[] = req.body;
+	let userId = req.userId;
 
   Unit.findOne({ unitNumber })
     .exec()
