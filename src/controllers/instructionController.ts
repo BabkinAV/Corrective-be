@@ -14,19 +14,19 @@ export const createNewInstruction: RequestHandler = (req, res, next) => {
     link: instructionRequestBody.link,
   });
 
-  instructionItem
-    .save()
-    .then(result => {
-      res.status(201).json({
-        message: 'instruction created succesfully',
-        instructionItem,
-      });
-    })
-    .catch((err: { statusCode?: number }) => {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
+  // instructionItem
+  //   .save()
+  //   .then(result => {
+  //     res.status(201).json({
+  //       message: 'instruction created succesfully',
+  //       instructionItem,
+  //     });
+  //   })
+  //   .catch((err: { statusCode?: number }) => {
+  //     if (!err.statusCode) {
+  //       err.statusCode = 500;
+  //     }
 	
-      next(err);
-    });
+  //     next(err);
+  //   });
 };

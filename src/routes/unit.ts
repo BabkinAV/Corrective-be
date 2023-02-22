@@ -9,7 +9,7 @@ const router = Router()
 
 
 // POST /unit/:unitNo
-router.post('/',  addAffectedUnit);
+// router.post('/',  addAffectedUnit);
 
 // PUT /unit/updatestatus/:unitNo
 router.put('/updatestatus/:unitnumber', isAuth,  updateAffectedUnitStatus)
